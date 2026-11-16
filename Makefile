@@ -1,5 +1,8 @@
 .DEFAULT_GOAL := all
 PYTHON ?= python3
+UV ?= uv
+TEST_PYTHON ?= 3.12
+TEST_ARGS ?=
 ARGS ?=
 
 .PHONY: all install run debug test test-model clean lint lint-strict
@@ -17,10 +20,12 @@ debug:
 	uv run --no-sync python -m pdb -m src $(ARGS)
 
 test:
-	$(PYTHON) -m unittest discover -s tests -p 'test_edges.py' -v
+	$(UV) run --no-project --python $(TEST_PYTHON) \
+		--with-requirements requirements-test.txt \
+		python -m pytest tests -m 'not model' -v $(TEST_ARGS)
 
 test-model:
-	uv run --no-sync python -m pytest tests/test_tokenizer.py -v
+	$(UV) run python -m pytest tests/test_model.py -m model -v $(TEST_ARGS)
 
 clean:
 	rm -rf .pytest_cache .mypy_cache __pycache__ src/__pycache__ src/.mypy_cache

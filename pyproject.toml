@@ -13,6 +13,10 @@ dependencies = [
     "transformers>=5.13.0",
 ]
 
+[tool.pytest.ini_options]
+addopts = "-m 'not model'"
+markers = ["model: requires the SDK runtime and downloads model weights"]
+
 [tool.uv.workspace]
 members = [
     "llm_sdk",

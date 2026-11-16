@@ -1,16 +1,20 @@
 """Simulation runner for LLM function calling with constrained decoding."""
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
 import re
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from pydantic import BaseModel, ValidationError
-from llm_sdk import Small_LLM_Model
 from src.tokenizer import CustomTokenizer
+
+if TYPE_CHECKING:
+    from llm_sdk import Small_LLM_Model
 
 
 class FunctionParameter(BaseModel):

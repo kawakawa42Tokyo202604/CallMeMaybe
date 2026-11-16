@@ -54,6 +54,14 @@ Basic tests use a small local vocabulary to check empty strings, spaces, longest
 - Uses state transitions and token restrictions to construct JSON.
 - Uses Pydantic for input validation and helper rules to extract numbers and strings.
 
+### Tests
+
+```sh
+make test
+```
+
+`make test` requires Python 3.12+, uv, and Make. It prepares a cached environment and runs tokenizer, input, decoding-utility, and SDK packaging checks without model weights. `make test-model` loads the real SDK model and runs a forward pass; runtime dependencies and model weights may be downloaded. Use `MODEL_NAME` to select another model.
+
 ## 日本語
 
 「2と3を足して」のような文章を、プログラムが扱える関数名と引数のデータに変換するPythonのツールです。呼び出せる関数の一覧と指示文を読み込み、小型の言語モデル（LLM）を使ってJSON形式で結果を書き出します。
@@ -107,3 +115,11 @@ make lint        # flake8・mypy
 - 語彙ファイルを読み込み、最長一致でトークンを分割します。
 - 状態遷移とトークン候補の制御でJSONを生成します。
 - 入力検証にPydanticを使い、数値や文字列の抽出には補助的なルールも使います。
+
+### テスト
+
+```sh
+make test
+```
+
+`make test` はPython 3.12以降・uv・Makeを使い、キャッシュ上に環境を用意してトークン分割・入力検証・デコード補助・SDKの配布物を検証します。モデルの取得は不要です。`make test-model` は実モデルで推論処理を確認し、依存関係とモデルを取得します。`MODEL_NAME` でモデルを変更できます。

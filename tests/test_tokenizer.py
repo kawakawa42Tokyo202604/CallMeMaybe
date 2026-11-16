@@ -1,17 +1,42 @@
 """Unit tests for CustomTokenizer and
  constrained decoding utility functions.
 """
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import string
+from typing import TYPE_CHECKING, cast
+
 import pytest
-from llm_sdk import Small_LLM_Model
 from src.tokenizer import CustomTokenizer
 from src.run import mask_logits, resolve_param_value
 
+if TYPE_CHECKING:
+    from llm_sdk import Small_LLM_Model
+
+
+class LocalVocabulary:
+    """Expose a local vocabulary through the SDK's tokenizer interface."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+
+    def get_path_to_vocab_file(self) -> str:
+        """Return the vocabulary fixture without loading any model."""
+        return str(self.path)
+
 
 @pytest.fixture(scope="module")
-def tokenizer() -> CustomTokenizer:
-    """Fixture to initialize Small_LLM_Model and CustomTokenizer once."""
-    llm = Small_LLM_Model()
-    return CustomTokenizer(llm)
+def tokenizer(tmp_path_factory: pytest.TempPathFactory) -> CustomTokenizer:
+    """Exercise the real tokenizer with a complete local ASCII vocabulary."""
+    tokens = list(dict.fromkeys(
+        string.ascii_letters + string.digits + string.punctuation + "Ġ🌟"
+    )) + ["<|unk|>", "<|im_end|>", "<|im_start|>", "<|endoftext|>"]
+    path = tmp_path_factory.mktemp("vocabulary") / "vocab.json"
+    path.write_text(json.dumps(dict(zip(tokens, range(len(tokens))))),
+                    encoding="utf-8")
+    return CustomTokenizer(cast("Small_LLM_Model", LocalVocabulary(path)))
 
 
 class TestCustomTokenizer:
